@@ -58,6 +58,7 @@ import com.starkfuture.app.ui.theme.DarkSurface
 import com.starkfuture.app.ui.theme.DarkSurfaceAlt
 import com.starkfuture.app.ui.theme.DarkSurfaceSelected
 import com.starkfuture.app.ui.theme.DarkOverlay
+import com.starkfuture.app.ui.theme.DarkErrorSurface
 import com.starkfuture.app.ui.theme.DarkTextPrimary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -287,8 +288,8 @@ private fun ErrorState(message: String, retry: () -> Unit) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Color(0xFF101010),
-            contentColor = Color(0xFFF2F2F2)
+            containerColor = DarkErrorSurface,
+            contentColor = DarkTextPrimary
         )
     ) {
         Column(Modifier.padding(16.dp)) {
