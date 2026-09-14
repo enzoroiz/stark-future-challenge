@@ -3,12 +3,14 @@ package com.starkfuture.app.presentation.telemetry
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -29,6 +31,7 @@ import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +55,7 @@ import com.starkfuture.app.data.repository.TelemetryRepositoryImpl
 import com.starkfuture.app.domain.model.Telemetry
 import com.starkfuture.app.domain.model.Warning
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -68,33 +73,51 @@ fun TelemetryScreen() {
     val uiState by viewModel.uiState.collectAsState()
     val selectedScenario by viewModel.selectedScenario.collectAsState()
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                Text("Demo scenario", style = MaterialTheme.typography.labelLarge)
-                Spacer(Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    MockScenario.entries.forEach { scenario ->
-                        FilterChip(
-                                    selected = selectedScenario == scenario,
-                                    onClick = { viewModel.onScenarioSelected(scenario) },
-                            label = { Text(scenario.name.lowercase().replaceFirstChar { it.titlecase() }) }
-                        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    Text("Demo scenario", style = MaterialTheme.typography.labelLarge)
+                    Spacer(Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MockScenario.entries.forEach { scenario ->
+                            FilterChip(
+                                selected = selectedScenario == scenario,
+                                onClick = { viewModel.onScenarioSelected(scenario) },
+                                label = { Text(scenario.name.lowercase().replaceFirstChar { it.titlecase() }) }
+                            )
+                        }
                     }
                 }
-            }
 
-            when (val state = uiState) {
-                TelemetryUiState.Loading -> item { Text("Loading telemetry…") }
-                is TelemetryUiState.Success -> item { SuccessState(state.telemetry) }
-                TelemetryUiState.Empty -> item { EmptyState() }
-                is TelemetryUiState.Error -> item { ErrorState(state.message, viewModel::retry) }
+                when (val state = uiState) {
+                    TelemetryUiState.Loading -> item { Spacer(Modifier.height(1.dp)) }
+                    is TelemetryUiState.Success -> item { SuccessState(state.telemetry) }
+                    TelemetryUiState.Empty -> item { EmptyState() }
+                    is TelemetryUiState.Error -> item { ErrorState(state.message, viewModel::retry) }
+                }
+            }
+        }
+
+        if (uiState is TelemetryUiState.Loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0x88000000)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color.White)
+                Text(
+                    text = "Loading",
+                    color = Color.White,
+                    modifier = Modifier.padding(top = 64.dp)
+                )
             }
         }
     }
@@ -238,6 +261,7 @@ private object LocalTelemetryDependencies {
     val api = object : TelemetryApi {
         private val json = Json { ignoreUnknownKeys = true; explicitNulls = false }
         override suspend fun getTelemetry(): TelemetryDto = withContext(Dispatchers.IO) {
+            delay(2_000)
             val scenario = scenarioStore.currentScenarioForRequest()
             val body = when (scenario) {
                 MockScenario.SUCCESS -> SUCCESS_JSON
