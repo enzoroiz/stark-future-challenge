@@ -1,6 +1,0 @@
-{
-  "error": {
-    "code": "MOCK_TELEMETRY_ERROR",
-    "message": "Unable to retrieve bike telemetry."
-  }
-}
