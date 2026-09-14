@@ -17,15 +17,12 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Autorenew
 import androidx.compose.material.icons.rounded.Battery5Bar
 import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Circle
-import androidx.compose.material.icons.rounded.ElectricBolt
 import androidx.compose.material.icons.rounded.MonitorHeart
 import androidx.compose.material.icons.rounded.Route
-import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.Tune
@@ -56,6 +53,12 @@ import com.starkfuture.app.data.remote.model.TelemetryDto
 import com.starkfuture.app.data.repository.TelemetryRepositoryImpl
 import com.starkfuture.app.domain.model.Telemetry
 import com.starkfuture.app.domain.model.Warning
+import com.starkfuture.app.ui.theme.DarkBackground
+import com.starkfuture.app.ui.theme.DarkSurface
+import com.starkfuture.app.ui.theme.DarkSurfaceAlt
+import com.starkfuture.app.ui.theme.DarkSurfaceSelected
+import com.starkfuture.app.ui.theme.DarkOverlay
+import com.starkfuture.app.ui.theme.DarkTextPrimary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -76,10 +79,10 @@ fun TelemetryScreen() {
     val selectedScenario by viewModel.selectedScenario.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF050505)) {
+        Surface(modifier = Modifier.fillMaxSize(), color = DarkBackground) {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
-                containerColor = Color(0xFF050505)
+                containerColor = DarkBackground
             ) { padding ->
                 LazyColumn(
                     modifier = Modifier
@@ -94,6 +97,12 @@ fun TelemetryScreen() {
                                 FilterChip(
                                     selected = selectedScenario == scenario,
                                     onClick = { viewModel.onScenarioSelected(scenario) },
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        containerColor = DarkSurfaceAlt,
+                                        labelColor = DarkTextPrimary,
+                                        selectedContainerColor = DarkSurfaceSelected,
+                                        selectedLabelColor = DarkTextPrimary
+                                    ),
                                     label = { Text(scenario.name.lowercase().replaceFirstChar { it.titlecase() }) }
                                 )
                             }
@@ -114,13 +123,13 @@ fun TelemetryScreen() {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0x88000000)),
+                    .background(DarkOverlay),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = Color.White)
+                CircularProgressIndicator(color = DarkTextPrimary)
                 Text(
                     text = "Loading",
-                    color = Color.White,
+                    color = DarkTextPrimary,
                     modifier = Modifier.padding(top = 64.dp)
                 )
             }
@@ -134,8 +143,8 @@ private fun SuccessState(telemetry: Telemetry) {
         ElevatedCard(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.elevatedCardColors(
-                containerColor = Color(0xFF101010),
-                contentColor = Color(0xFFF2F2F2)
+                containerColor = DarkSurface,
+                contentColor = DarkTextPrimary
             )
         ) {
             Column(Modifier.padding(16.dp)) {
@@ -194,8 +203,8 @@ private fun TelemetryCard(
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Color(0xFF101010),
-            contentColor = Color(0xFFF2F2F2)
+            containerColor = DarkSurface,
+            contentColor = DarkTextPrimary
         )
     ) {
         Column(Modifier.padding(16.dp)) {
@@ -216,8 +225,8 @@ private fun WarningsCard(warnings: List<Warning>) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Color(0xFF101010),
-            contentColor = Color(0xFFF2F2F2)
+            containerColor = DarkSurface,
+            contentColor = DarkTextPrimary
         )
     ) {
         Column(Modifier.padding(16.dp)) {
@@ -263,8 +272,8 @@ private fun EmptyState() {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Color(0xFF101010),
-            contentColor = Color(0xFFF2F2F2)
+            containerColor = DarkSurface,
+            contentColor = DarkTextPrimary
         )
     ) {
         Column(Modifier.padding(16.dp)) {
