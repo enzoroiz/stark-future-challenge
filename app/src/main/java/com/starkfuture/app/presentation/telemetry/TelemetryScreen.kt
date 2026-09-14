@@ -4,16 +4,31 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Autorenew
+import androidx.compose.material.icons.rounded.Battery5Bar
+import androidx.compose.material.icons.rounded.Bolt
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Circle
+import androidx.compose.material.icons.rounded.ElectricBolt
+import androidx.compose.material.icons.rounded.MonitorHeart
+import androidx.compose.material.icons.rounded.Route
+import androidx.compose.material.icons.rounded.Speed
+import androidx.compose.material.icons.rounded.Thermostat
+import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -21,7 +36,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -101,21 +118,56 @@ private fun SuccessState(telemetry: Telemetry) {
                 }
             }
         }
-        TelemetryCard("Battery", "${telemetry.battery.stateOfChargePct}%", "Range ${telemetry.battery.estimatedRangeKm} km")
-        TelemetryCard("Power", "${telemetry.motor.powerHp} hp", "Motor temp ${telemetry.motor.temperatureC}°C")
-        TelemetryCard("Ride settings", telemetry.rideSettings.powerMap, "Max ${telemetry.rideSettings.maxPowerHp} hp")
-        TelemetryCard("Session", "${telemetry.session.durationS / 60} min", "${telemetry.session.distanceKm} km")
+        TelemetryCard(
+            title = "Battery",
+            primaryIcon = Icons.Rounded.Battery5Bar,
+            primary = "${telemetry.battery.stateOfChargePct}%",
+            secondaryIcon = Icons.Rounded.Route,
+            secondary = "Range ${telemetry.battery.estimatedRangeKm} km"
+        )
+        TelemetryCard(
+            title = "Power",
+            primaryIcon = Icons.Rounded.Bolt,
+            primary = "${telemetry.motor.powerHp} hp",
+            secondaryIcon = Icons.Rounded.Thermostat,
+            secondary = "Motor temp ${telemetry.motor.temperatureC}°C"
+        )
+        TelemetryCard(
+            title = "Ride settings",
+            primaryIcon = Icons.Rounded.Tune,
+            primary = telemetry.rideSettings.powerMap.uppercase(),
+            secondaryIcon = Icons.Rounded.Bolt,
+            secondary = "Max ${telemetry.rideSettings.maxPowerHp} hp"
+        )
+        TelemetryCard(
+            title = "Session",
+            primaryIcon = Icons.Rounded.Timer,
+            primary = formatDuration(telemetry.session.durationS),
+            secondaryIcon = Icons.Rounded.Route,
+            secondary = "${telemetry.session.distanceKm} km"
+        )
         WarningsCard(telemetry.warnings)
     }
 }
 
 @Composable
-private fun TelemetryCard(title: String, primary: String, secondary: String) {
+private fun TelemetryCard(
+    title: String,
+    primaryIcon: ImageVector,
+    primary: String,
+    secondaryIcon: ImageVector,
+    secondary: String
+) {
     ElevatedCard(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.elevatedCardColors()) {
         Column(Modifier.padding(16.dp)) {
             Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(primary, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            Text(secondary)
+            IconValueRow(
+                icon = primaryIcon,
+                value = primary,
+                valueStyle = MaterialTheme.typography.headlineSmall,
+                valueWeight = FontWeight.Bold
+            )
+            IconValueRow(icon = secondaryIcon, value = secondary)
         }
     }
 }
@@ -124,16 +176,41 @@ private fun TelemetryCard(title: String, primary: String, secondary: String) {
 private fun WarningsCard(warnings: List<Warning>) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp)) {
-            Text("Warnings", style = MaterialTheme.typography.titleMedium)
+            IconValueRow(icon = Icons.Rounded.MonitorHeart, value = "Diagnostics", valueWeight = FontWeight.SemiBold)
             if (warnings.isEmpty()) {
-                Text("No active warnings")
+                IconValueRow(icon = Icons.Rounded.CheckCircle, value = "No faults")
+                IconValueRow(icon = Icons.Rounded.Circle, value = "Connected")
             } else {
                 warnings.forEach { warning ->
-                    Text("${warning.code} · ${warning.message}")
+                    IconValueRow(icon = Icons.Rounded.Warning, value = "${warning.code} · ${warning.message}")
                 }
             }
         }
     }
+}
+
+@Composable
+private fun IconValueRow(
+    icon: ImageVector,
+    value: String,
+    valueStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyLarge,
+    valueWeight: FontWeight = FontWeight.Normal
+) {
+    Row(
+        modifier = Modifier.padding(top = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(imageVector = icon, contentDescription = null)
+        Spacer(Modifier.width(8.dp))
+        Text(text = value, style = valueStyle, fontWeight = valueWeight)
+    }
+}
+
+private fun formatDuration(durationSeconds: Int): String {
+    val hours = durationSeconds / 3600
+    val minutes = (durationSeconds % 3600) / 60
+    val seconds = durationSeconds % 60
+    return "%d:%02d:%02d".format(hours, minutes, seconds)
 }
 
 @Composable
