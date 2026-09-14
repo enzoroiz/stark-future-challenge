@@ -130,15 +130,14 @@ private fun SuccessState(telemetry: Telemetry) {
             Column(Modifier.padding(16.dp)) {
                 Text(telemetry.bike.model, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 Text("${telemetry.bike.variant} • Firmware ${telemetry.bike.firmwareVersion}")
-                if (telemetry.bike.imageUrl.isNotBlank()) {
-                    Spacer(Modifier.height(12.dp))
-                    AsyncImage(
-                        model = telemetry.bike.imageUrl,
-                        contentDescription = telemetry.bike.model,
-                        modifier = Modifier.fillMaxWidth(),
-                        contentScale = ContentScale.Fit
-                    )
-                }
+                Spacer(Modifier.height(12.dp))
+                AsyncImage(
+                    model = telemetry.bike.imageUrl,
+                    contentDescription = telemetry.bike.model,
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentScale = ContentScale.Fit
+                )
             }
         }
         TelemetryCard(
