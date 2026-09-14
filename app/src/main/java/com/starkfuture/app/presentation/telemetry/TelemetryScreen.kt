@@ -83,8 +83,6 @@ fun TelemetryScreen() {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    Text("Demo scenario", style = MaterialTheme.typography.labelLarge)
-                    Spacer(Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         MockScenario.entries.forEach { scenario ->
                             FilterChip(
