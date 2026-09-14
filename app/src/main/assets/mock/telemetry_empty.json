@@ -1,0 +1,12 @@
+{
+  "bike": null,
+  "timestamp": null,
+  "battery": null,
+  "motor": null,
+  "ride_settings": null,
+  "session": null,
+  "diagnostics": {
+    "fault_codes": [],
+    "warnings": []
+  }
+}
