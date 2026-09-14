@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Autorenew
 import androidx.compose.material.icons.rounded.Battery5Bar
@@ -35,6 +36,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
@@ -74,31 +76,36 @@ fun TelemetryScreen() {
     val selectedScenario by viewModel.selectedScenario.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        MockScenario.entries.forEach { scenario ->
-                            FilterChip(
-                                selected = selectedScenario == scenario,
-                                onClick = { viewModel.onScenarioSelected(scenario) },
-                                label = { Text(scenario.name.lowercase().replaceFirstChar { it.titlecase() }) }
-                            )
+        Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF050505)) {
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                containerColor = Color(0xFF050505)
+            ) { padding ->
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    item {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            MockScenario.entries.forEach { scenario ->
+                                FilterChip(
+                                    selected = selectedScenario == scenario,
+                                    onClick = { viewModel.onScenarioSelected(scenario) },
+                                    label = { Text(scenario.name.lowercase().replaceFirstChar { it.titlecase() }) }
+                                )
+                            }
                         }
                     }
-                }
 
-                when (val state = uiState) {
-                    TelemetryUiState.Loading -> item { Spacer(Modifier.height(1.dp)) }
-                    is TelemetryUiState.Success -> item { SuccessState(state.telemetry) }
-                    TelemetryUiState.Empty -> item { EmptyState() }
-                    is TelemetryUiState.Error -> item { ErrorState(state.message, viewModel::retry) }
+                    when (val state = uiState) {
+                        TelemetryUiState.Loading -> item { Spacer(Modifier.height(1.dp)) }
+                        is TelemetryUiState.Success -> item { SuccessState(state.telemetry) }
+                        TelemetryUiState.Empty -> item { EmptyState() }
+                        is TelemetryUiState.Error -> item { ErrorState(state.message, viewModel::retry) }
+                    }
                 }
             }
         }
@@ -124,7 +131,13 @@ fun TelemetryScreen() {
 @Composable
 private fun SuccessState(telemetry: Telemetry) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+        ElevatedCard(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = Color(0xFF101010),
+                contentColor = Color(0xFFF2F2F2)
+            )
+        ) {
             Column(Modifier.padding(16.dp)) {
                 Text(telemetry.bike.model, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 Text("${telemetry.bike.variant} • Firmware ${telemetry.bike.firmwareVersion}")
@@ -178,7 +191,13 @@ private fun TelemetryCard(
     secondaryIcon: ImageVector,
     secondary: String
 ) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.elevatedCardColors()) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = Color(0xFF101010),
+            contentColor = Color(0xFFF2F2F2)
+        )
+    ) {
         Column(Modifier.padding(16.dp)) {
             Text(title, style = MaterialTheme.typography.titleMedium)
             IconValueRow(
@@ -194,7 +213,13 @@ private fun TelemetryCard(
 
 @Composable
 private fun WarningsCard(warnings: List<Warning>) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = Color(0xFF101010),
+            contentColor = Color(0xFFF2F2F2)
+        )
+    ) {
         Column(Modifier.padding(16.dp)) {
             IconValueRow(icon = Icons.Rounded.MonitorHeart, value = "Diagnostics", valueWeight = FontWeight.SemiBold)
             if (warnings.isEmpty()) {
@@ -235,7 +260,13 @@ private fun formatDuration(durationSeconds: Int): String {
 
 @Composable
 private fun EmptyState() {
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = Color(0xFF101010),
+            contentColor = Color(0xFFF2F2F2)
+        )
+    ) {
         Column(Modifier.padding(16.dp)) {
             Text("No telemetry available")
         }
@@ -244,7 +275,13 @@ private fun EmptyState() {
 
 @Composable
 private fun ErrorState(message: String, retry: () -> Unit) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = Color(0xFF101010),
+            contentColor = Color(0xFFF2F2F2)
+        )
+    ) {
         Column(Modifier.padding(16.dp)) {
             Text("Telemetry unavailable")
             Text(message)
