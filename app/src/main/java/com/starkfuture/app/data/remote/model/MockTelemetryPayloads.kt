@@ -1,4 +1,4 @@
-package com.starkfuture.app.presentation.telemetry
+package com.starkfuture.app.data.remote.model
 
 internal object MockTelemetryPayloads {
     const val SUCCESS_JSON = """

@@ -2,8 +2,8 @@ package com.starkfuture.app.data.remote
 
 import com.starkfuture.app.data.mock.MockScenario
 import com.starkfuture.app.data.mock.MockScenarioStore
+import com.starkfuture.app.data.remote.model.MockTelemetryPayloads
 import com.starkfuture.app.data.remote.model.TelemetryDto
-import com.starkfuture.app.presentation.telemetry.MockTelemetryPayloads
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
