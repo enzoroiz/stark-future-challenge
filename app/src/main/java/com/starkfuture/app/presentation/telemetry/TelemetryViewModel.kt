@@ -2,16 +2,19 @@ package com.starkfuture.app.presentation.telemetry
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import com.starkfuture.app.data.mock.MockScenario
 import com.starkfuture.app.data.mock.MockScenarioStore
 import com.starkfuture.app.domain.repository.TelemetryRepository
 import com.starkfuture.app.domain.repository.TelemetryResult
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class TelemetryViewModel(
+@HiltViewModel
+class TelemetryViewModel @Inject constructor(
     private val repository: TelemetryRepository,
     private val scenarioStore: MockScenarioStore
 ) : ViewModel() {
@@ -43,19 +46,5 @@ class TelemetryViewModel(
                 is TelemetryResult.Error -> _uiState.value = TelemetryUiState.Error(result.message)
             }
         }
-    }
-
-}
-
-class TelemetryViewModelFactory(
-    private val repository: TelemetryRepository,
-    private val scenarioStore: MockScenarioStore
-) : androidx.lifecycle.ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TelemetryViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return TelemetryViewModel(repository, scenarioStore) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

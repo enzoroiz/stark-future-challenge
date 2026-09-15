@@ -6,8 +6,9 @@ import com.starkfuture.app.domain.repository.TelemetryRepository
 import com.starkfuture.app.domain.repository.TelemetryResult
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
-class TelemetryRepositoryImpl(
+class TelemetryRepositoryImpl @Inject constructor(
     private val api: TelemetryApi
 ) : TelemetryRepository {
 

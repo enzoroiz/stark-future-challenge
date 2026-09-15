@@ -43,13 +43,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.starkfuture.app.data.mock.MockScenario
-import com.starkfuture.app.data.mock.MockScenarioStore
-import com.starkfuture.app.data.remote.api.TelemetryApi
-import com.starkfuture.app.data.remote.model.TelemetryDto
-import com.starkfuture.app.data.repository.TelemetryRepositoryImpl
 import com.starkfuture.app.domain.model.Telemetry
 import com.starkfuture.app.domain.model.Warning
 import com.starkfuture.app.ui.theme.DarkBackground
@@ -59,22 +55,10 @@ import com.starkfuture.app.ui.theme.DarkSurfaceSelected
 import com.starkfuture.app.ui.theme.DarkOverlay
 import com.starkfuture.app.ui.theme.DarkErrorSurface
 import com.starkfuture.app.ui.theme.DarkTextPrimary
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
-import okhttp3.ResponseBody.Companion.toResponseBody
-import retrofit2.HttpException
-import retrofit2.Response
 
 @Composable
 fun TelemetryScreen() {
-    val viewModel = viewModel<TelemetryViewModel>(
-        factory = TelemetryViewModelFactory(
-            LocalTelemetryDependencies.repository,
-            LocalTelemetryDependencies.scenarioStore
-        )
-    )
+    val viewModel: TelemetryViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val selectedScenario by viewModel.selectedScenario.collectAsState()
 
@@ -290,25 +274,4 @@ private fun ErrorState(message: String, retry: () -> Unit) {
             OutlinedButton(onClick = retry) { Text("Retry") }
         }
     }
-}
-
-private object LocalTelemetryDependencies {
-    val scenarioStore = MockScenarioStore()
-    val api = object : TelemetryApi {
-        private val json = Json { ignoreUnknownKeys = true; explicitNulls = false }
-        override suspend fun getTelemetry(): TelemetryDto = withContext(Dispatchers.IO) {
-            delay(2_000)
-            val scenario = scenarioStore.currentScenarioForRequest()
-            val body = when (scenario) {
-                MockScenario.SUCCESS -> TelemetryFixtures.SUCCESS_JSON
-                MockScenario.EMPTY -> TelemetryFixtures.EMPTY_JSON
-                MockScenario.ERROR -> TelemetryFixtures.ERROR_JSON
-            }
-            if (scenario == MockScenario.ERROR) {
-                throw HttpException(Response.error<TelemetryDto>(500, body.toResponseBody()))
-            }
-            return@withContext json.decodeFromString(TelemetryDto.serializer(), body)
-        }
-    }
-    val repository = TelemetryRepositoryImpl(api)
 }
