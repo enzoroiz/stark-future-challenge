@@ -17,20 +17,13 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Battery5Bar
-import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Circle
 import androidx.compose.material.icons.rounded.MonitorHeart
-import androidx.compose.material.icons.rounded.Route
-import androidx.compose.material.icons.rounded.Thermostat
-import androidx.compose.material.icons.rounded.Timer
-import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.Surface
@@ -39,14 +32,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil3.compose.AsyncImage
 import com.starkfuture.app.data.mock.MockScenario
-import com.starkfuture.app.domain.model.Telemetry
 import com.starkfuture.app.domain.model.Warning
 import com.starkfuture.app.ui.theme.DarkBackground
 import com.starkfuture.app.ui.theme.DarkSurface
@@ -121,62 +111,7 @@ fun TelemetryScreen() {
 }
 
 @Composable
-private fun SuccessState(telemetry: Telemetry) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        ElevatedCard(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.elevatedCardColors(
-                containerColor = DarkSurface,
-                contentColor = DarkTextPrimary
-            )
-        ) {
-            Column(Modifier.padding(16.dp)) {
-                Text(telemetry.bike.model, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Text("${telemetry.bike.variant} • Firmware ${telemetry.bike.firmwareVersion}")
-                Spacer(Modifier.height(12.dp))
-                AsyncImage(
-                    model = telemetry.bike.imageUrl,
-                    contentDescription = telemetry.bike.model,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    contentScale = ContentScale.Fit
-                )
-            }
-        }
-        TelemetryCard(
-            title = "Battery",
-            primaryIcon = Icons.Rounded.Battery5Bar,
-            primary = "${telemetry.battery.stateOfChargePct}%",
-            secondaryIcon = Icons.Rounded.Route,
-            secondary = "Range ${telemetry.battery.estimatedRangeKm} km"
-        )
-        TelemetryCard(
-            title = "Power",
-            primaryIcon = Icons.Rounded.Bolt,
-            primary = "${telemetry.motor.powerHp} hp",
-            secondaryIcon = Icons.Rounded.Thermostat,
-            secondary = "Motor temp ${telemetry.motor.temperatureC}°C"
-        )
-        TelemetryCard(
-            title = "Ride settings",
-            primaryIcon = Icons.Rounded.Tune,
-            primary = telemetry.rideSettings.powerMap.uppercase(),
-            secondaryIcon = Icons.Rounded.Bolt,
-            secondary = "Max ${telemetry.rideSettings.maxPowerHp} hp"
-        )
-        TelemetryCard(
-            title = "Session",
-            primaryIcon = Icons.Rounded.Timer,
-            primary = telemetry.session.durationFormatted,
-            secondaryIcon = Icons.Rounded.Route,
-            secondary = "${telemetry.session.distanceKm} km"
-        )
-        WarningsCard(telemetry.warnings)
-    }
-}
-
-@Composable
-private fun TelemetryCard(
+fun TelemetryCard(
     title: String,
     primaryIcon: ImageVector,
     primary: String,
@@ -204,7 +139,7 @@ private fun TelemetryCard(
 }
 
 @Composable
-private fun WarningsCard(warnings: List<Warning>) {
+fun WarningsCard(warnings: List<Warning>) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(
@@ -243,44 +178,3 @@ private fun IconValueRow(
     }
 }
 
-@Composable
-private fun EmptyState() {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "There's no telemetry available",
-                style = MaterialTheme.typography.bodyLarge,
-                color = DarkTextPrimary
-            )
-        }
-    }
-}
-
-@Composable
-private fun ErrorState(message: String, retry: () -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyLarge,
-                color = DarkTextPrimary
-            )
-            Spacer(Modifier.height(12.dp))
-            OutlinedButton(onClick = retry) {
-                Text("Try again")
-            }
-        }
-    }
-}

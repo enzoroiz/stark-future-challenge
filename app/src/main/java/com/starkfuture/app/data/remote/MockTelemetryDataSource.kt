@@ -17,7 +17,8 @@ class MockTelemetryDataSource @Inject constructor(
     private val scenarioStore: MockScenarioStore
 ) : TelemetryDataSource {
     override suspend fun getTelemetry(): TelemetryDto = withContext(Dispatchers.IO) {
-        delay(2_000)
+        // Simulates a network delay before returning mock telemetry data.
+        delay(1_000)
         val body = when (scenarioStore.currentScenarioForRequest()) {
             MockScenario.SUCCESS -> MockTelemetryPayloads.SUCCESS_JSON
             MockScenario.EMPTY -> MockTelemetryPayloads.EMPTY_JSON
