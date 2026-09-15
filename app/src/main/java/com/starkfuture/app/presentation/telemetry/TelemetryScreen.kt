@@ -219,7 +219,7 @@ private fun WarningsCard(warnings: List<Warning>) {
                 IconValueRow(icon = Icons.Rounded.Circle, value = "Connected")
             } else {
                 warnings.forEach { warning ->
-                    IconValueRow(icon = Icons.Rounded.Warning, value = "$warning.message")
+                    IconValueRow(icon = Icons.Rounded.Warning, value = warning.message)
                 }
             }
         }
