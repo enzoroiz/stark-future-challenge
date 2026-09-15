@@ -53,7 +53,6 @@ import com.starkfuture.app.ui.theme.DarkSurface
 import com.starkfuture.app.ui.theme.DarkSurfaceAlt
 import com.starkfuture.app.ui.theme.DarkSurfaceSelected
 import com.starkfuture.app.ui.theme.DarkOverlay
-import com.starkfuture.app.ui.theme.DarkErrorSurface
 import com.starkfuture.app.ui.theme.DarkTextPrimary
 
 @Composable
@@ -264,7 +263,7 @@ private fun ErrorState(message: String, retry: () -> Unit) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = DarkErrorSurface,
+            containerColor = DarkSurface,
             contentColor = DarkTextPrimary
         )
     ) {
