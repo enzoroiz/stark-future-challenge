@@ -96,7 +96,7 @@ fun TelemetryScreen() {
                         TelemetryUiState.Loading -> item { Spacer(Modifier.height(1.dp)) }
                         is TelemetryUiState.Success -> item { SuccessState(state.telemetry) }
                         TelemetryUiState.Empty -> item { EmptyState() }
-                        is TelemetryUiState.Error -> item { ErrorState(state.message, viewModel::retry) }
+                        is TelemetryUiState.Error -> item { ErrorState(viewModel::retry) }
                     }
                 }
             }
@@ -245,32 +245,40 @@ private fun IconValueRow(
 
 @Composable
 private fun EmptyState() {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = DarkSurface,
-            contentColor = DarkTextPrimary
-        )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.CenterStart
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Text("No telemetry available")
-        }
+        Text(
+            text = "There's no telemetry available",
+            style = MaterialTheme.typography.bodyLarge,
+            color = DarkTextPrimary,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
 @Composable
-private fun ErrorState(message: String, retry: () -> Unit) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = DarkSurface,
-            contentColor = DarkTextPrimary
-        )
+private fun ErrorState(retry: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.CenterStart
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Text("Telemetry unavailable")
-            Text(message)
-            OutlinedButton(onClick = retry) { Text("Retry") }
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Something went wrong while fetching the telemetry",
+                style = MaterialTheme.typography.bodyLarge,
+                color = DarkTextPrimary
+            )
+            Spacer(Modifier.height(12.dp))
+            OutlinedButton(onClick = retry) {
+                Text("Try again")
+            }
         }
     }
 }
