@@ -38,6 +38,7 @@ data class RideSettings(
 
 data class Session(
     val durationS: Int,
+    val durationFormatted: String,
     val distanceKm: Double,
     val maxSpeedKmh: Double
 )

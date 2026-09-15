@@ -39,7 +39,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -185,7 +184,7 @@ private fun SuccessState(telemetry: Telemetry) {
         TelemetryCard(
             title = "Session",
             primaryIcon = Icons.Rounded.Timer,
-            primary = formatDuration(telemetry.session.durationS),
+            primary = telemetry.session.durationFormatted,
             secondaryIcon = Icons.Rounded.Route,
             secondary = "${telemetry.session.distanceKm} km"
         )
@@ -261,13 +260,6 @@ private fun IconValueRow(
     }
 }
 
-private fun formatDuration(durationSeconds: Int): String {
-    val hours = durationSeconds / 3600
-    val minutes = (durationSeconds % 3600) / 60
-    val seconds = durationSeconds % 60
-    return "%d:%02d:%02d".format(hours, minutes, seconds)
-}
-
 @Composable
 private fun EmptyState() {
     ElevatedCard(
@@ -308,9 +300,9 @@ private object LocalTelemetryDependencies {
             delay(2_000)
             val scenario = scenarioStore.currentScenarioForRequest()
             val body = when (scenario) {
-                MockScenario.SUCCESS -> SUCCESS_JSON
-                MockScenario.EMPTY -> EMPTY_JSON
-                MockScenario.ERROR -> ERROR_JSON
+                MockScenario.SUCCESS -> TelemetryFixtures.SUCCESS_JSON
+                MockScenario.EMPTY -> TelemetryFixtures.EMPTY_JSON
+                MockScenario.ERROR -> TelemetryFixtures.ERROR_JSON
             }
             if (scenario == MockScenario.ERROR) {
                 throw HttpException(Response.error<TelemetryDto>(500, body.toResponseBody()))
@@ -320,70 +312,3 @@ private object LocalTelemetryDependencies {
     }
     val repository = TelemetryRepositoryImpl(api)
 }
-
-private const val SUCCESS_JSON = """
-{
-  "bike": {
-    "model": "Stark VARG MX 1.2",
-    "variant": "Alpha",
-    "firmware_version": "3.4.1",
-    "image_url": "https://assets.starkfuture.com/frontend-assets/mx-product-images/SMX1_side_stand_red_handbrake_enduro18_nosidestand.webp"
-  },
-  "timestamp": "2025-05-19T10:32:45Z",
-  "battery": {
-    "state_of_charge_pct": 73,
-    "estimated_range_km": 38,
-    "temperature_c": 34.7,
-    "charging_state": "discharging"
-  },
-  "motor": {
-    "power_hp": 52.4,
-    "temperature_c": 61.2
-  },
-  "ride_settings": {
-    "power_map": "enduro",
-    "max_power_hp": 80,
-    "engine_braking_pct": 45,
-    "regen_pct": 60
-  },
-  "session": {
-    "duration_s": 3742,
-    "distance_km": 24.7,
-    "max_speed_kmh": 94.1
-  },
-  "diagnostics": {
-    "fault_codes": [],
-    "warnings": [
-      {
-        "code": "W_MOT_TEMP_HIGH",
-        "message": "Motor temperature elevated",
-        "severity": "warning"
-      }
-    ]
-  }
-}
-"""
-
-private const val EMPTY_JSON = """
-{
-  "bike": null,
-  "timestamp": null,
-  "battery": null,
-  "motor": null,
-  "ride_settings": null,
-  "session": null,
-  "diagnostics": {
-    "fault_codes": [],
-    "warnings": []
-  }
-}
-"""
-
-private const val ERROR_JSON = """
-{
-  "error": {
-    "code": "MOCK_TELEMETRY_ERROR",
-    "message": "Unable to retrieve bike telemetry."
-  }
-}
-"""
