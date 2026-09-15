@@ -1,30 +1,29 @@
 package com.starkfuture.app.data.repository
 
 import com.starkfuture.app.data.mapper.TelemetryMapper
-import com.starkfuture.app.data.remote.api.TelemetryApi
+import com.starkfuture.app.data.remote.TelemetryDataSource
+import com.starkfuture.app.data.mock.MockScenario
+import com.starkfuture.app.data.mock.MockScenarioStore
 import com.starkfuture.app.domain.repository.TelemetryRepository
 import com.starkfuture.app.domain.repository.TelemetryResult
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 class TelemetryRepositoryImpl @Inject constructor(
-    private val api: TelemetryApi
+    private val dataSource: TelemetryDataSource,
+    private val scenarioStore: MockScenarioStore
 ) : TelemetryRepository {
 
     override suspend fun getTelemetry(): TelemetryResult {
         return try {
-            val dto = api.getTelemetry()
+            if (scenarioStore.currentScenarioForRequest() == MockScenario.ERROR) {
+                return TelemetryResult.Error("Telemetry request failed (500).")
+            }
+            val dto = dataSource.getTelemetry()
             if (dto.isEmpty() || dto.bike == null || dto.battery == null || dto.motor == null || dto.rideSettings == null || dto.session == null) {
                 TelemetryResult.Empty
             } else {
                 TelemetryResult.Success(TelemetryMapper.toDomain(dto))
             }
-        } catch (e: HttpException) {
-            val message = e.message ?: "Telemetry request failed (${e.code()})."
-            TelemetryResult.Error(message)
-        } catch (e: IOException) {
-            TelemetryResult.Error("Unable to reach the telemetry service.")
         } catch (e: IllegalArgumentException) {
             TelemetryResult.Error("Unexpected telemetry response.")
         } catch (e: Exception) {

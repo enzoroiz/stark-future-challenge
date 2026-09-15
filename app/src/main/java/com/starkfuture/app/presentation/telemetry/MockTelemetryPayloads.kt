@@ -1,6 +1,6 @@
 package com.starkfuture.app.presentation.telemetry
 
-internal object TelemetryFixtures {
+internal object MockTelemetryPayloads {
     const val SUCCESS_JSON = """
     {
       "bike": {
