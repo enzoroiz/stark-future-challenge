@@ -1,124 +1,29 @@
 # Stark Future App
 
-An Android telemetry dashboard built in Kotlin using Jetpack Compose and a clean, testable architecture. This project was designed to demonstrate scalable Android development patterns and best practices commonly used in production mobile apps.
+A small Android telemetry dashboard built with Kotlin and Jetpack Compose. The app demonstrates a clean Android architecture with reactive state handling, dependency injection, and testable business logic.
 
-## Overview
+## Key architecture and library choices
 
-The app displays bike telemetry data in a structured dashboard, including:
-- battery status and estimated range
-- motor power and temperature
-- ride configuration and session metrics
-- diagnostic warnings and status feedback
+- MVVM: ViewModel owns UI state and keeps screen logic separate from rendering.
+- Jetpack Compose: modern declarative UI with reusable components and state-driven rendering.
+- Hilt: dependency injection keeps the project easier to test and extend.
+- Clean Architecture: separation between `data`, `domain`, and `presentation` layers.
+- Repository pattern: centralizes data access, mapping, and error handling.
+- Coroutines + Flow + StateFlow: handles loading, success, empty, and error states.
+- Coil: loads the bike image efficiently in Compose.
+- Unit tests: verifies repository and ViewModel logic for success, empty, error, and retry scenarios.
 
-The UI is built with Compose and Material 3, while the application logic follows a clean architecture to keep responsibilities separated and the codebase maintainable.
+## Usage
 
-## Architecture and Best Practices
+The app includes scenario toggles to switch between states:
+They can be selected from the filter chips in the UI and trigger the ViewModel to reload telemetry accordingly.
 
-### MVVM (Model-View-ViewModel)
-The presentation layer is built around MVVM, which separates user interface logic from the screen rendering.
+- Success: renders valid telemetry data
+- Error: simulates a failed telemetry request, allowing retry (always goes back to success on retry)
+- Empty: displays the no-data state
 
-- ViewModels own and expose UI state to the composable screen
-- state is observed through Flow and StateFlow
-- user interactions are handled through explicit ViewModel methods
-- the UI remains predictable, easier to test, and simpler to evolve over time
+## Trade-offs and things I would improve with more time
 
-### Jetpack Compose
-The interface is implemented using Jetpack Compose.
-
-- reusable composable components
-- state-driven rendering with `collectAsState()`
-- easier maintenance and faster iteration
-
-### Hilt for Dependency Injection
-Hilt is used to manage dependency injection across the app.
-
-- repositories are injected into ViewModels
-- manual object wiring is reduced
-- dependencies are more centralized and easier to maintain
-- the app is easier to test by injecting mock implementations
-
-### Clean Architecture
-The project follows a layered structure inspired by Clean Architecture.
-
-- `data` layer: data sources, DTOs, mapping logic, repository implementations, mock scenarios
-- `domain` layer: business models and repository contracts
-- `presentation` layer: ViewModels and Compose screens
-
-This separation aims to improve:
-- maintainability
-- decoupling between UI code and data sources
-- easier testing of business behavior
-- flexibility to replace or extend data providers later
-
-### Repository Pattern and Data Handling
-The repository layer acts as the boundary between the data source and the rest of the application.
-
-- repository interfaces define a clear contract
-- concrete implementations handle validation and error mapping
-- DTOs are transformed into domain models through mapper classes
-result states represent success, empty, and error scenarios
-
-### State Handling and Unidirectional UI Flow
-The app uses a Flow-based state model to manage UI behavior.
-
-- loading, success, empty, and error states are well defined
-- the screen responds to state changes
-- the single source of truth remains in the ViewModel
-- interactions such as retrying and changing a scenario are handled in a predictable way
-
-### Coil for Image Loading
-Coil is used to loading the bike image inside the Compose UI.
-
-- native compatibility with Jetpack Compose
-- efficient image loading and caching
-
-### Unit Testing
-The project includes unit tests covering both ViewModel and repository logic for regression prevention.
-
-Examples covered:
-- successful data loading
-- empty response handling
-- error propagation
-- retry behavior
-- scenario-based state changes
-
-### Error Handling and Resilience
-The app is designed to handle failures instead of crashing the UI.
-
-- network and unexpected exceptions are converted into explicit result states
-- empty data is treated as a valid business case rather than a runtime failure
-- retry flows are supported to recover from transient issues
-- failures are visible and understandable from the screen state
-
-## Project Structure
-
-```text
-app/
-├── data/
-│   ├── mapper/
-│   ├── mock/
-│   ├── remote/
-│   └── repository/
-├── di/
-├── domain/
-│   ├── model/
-│   └── repository/
-├── presentation/
-│   └── telemetry/
-├── ui/
-└── MainActivity.kt
-```
-
-## Tech Stack
-
-- Kotlin
-- Jetpack Compose
-- Material 3
-- MVVM
-- Hilt
-- Coroutines + Flow
-- StateFlow
-- Clean Architecture
-- Repository Pattern
-- Coil
-- JUnit
+- More dedicated UI polish: add linear gauges for battery, motor health, and range; better card grouping for readability.
+- Better Empty and Error states: stronger messaging, adding images / animations, and clearer recovery actions.
+- UI testing: add Compose UI tests to validate state rendering and interactions.
