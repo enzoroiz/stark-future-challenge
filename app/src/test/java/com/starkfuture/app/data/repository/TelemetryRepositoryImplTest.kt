@@ -1,7 +1,5 @@
 package com.starkfuture.app.data.repository
 
-import com.starkfuture.app.data.mock.MockScenario
-import com.starkfuture.app.data.mock.MockScenarioStore
 import com.starkfuture.app.data.remote.TelemetryDataSource
 import com.starkfuture.app.data.remote.model.BatteryDto
 import com.starkfuture.app.data.remote.model.BikeDto
@@ -19,10 +17,8 @@ import org.junit.Test
 class TelemetryRepositoryImplTest {
     @Test
     fun getTelemetry_returnsSuccessWhenDataSourceReturnsValidTelemetry() = runTest {
-        val scenarioStore = MockScenarioStore()
         val repository = TelemetryRepositoryImpl(
-            dataSource = FakeTelemetryDataSource(validTelemetryDto()),
-            scenarioStore = scenarioStore
+            dataSource = FakeTelemetryDataSource(validTelemetryDto())
         )
 
         val result = repository.getTelemetry()
@@ -36,8 +32,7 @@ class TelemetryRepositoryImplTest {
     @Test
     fun getTelemetry_returnsEmptyWhenDataSourceReturnsEmptyTelemetry() = runTest {
         val repository = TelemetryRepositoryImpl(
-            dataSource = FakeTelemetryDataSource(TelemetryDto()),
-            scenarioStore = MockScenarioStore()
+            dataSource = FakeTelemetryDataSource(TelemetryDto())
         )
 
         val result = repository.getTelemetry()
@@ -46,22 +41,20 @@ class TelemetryRepositoryImplTest {
     }
 
     @Test
-    fun getTelemetry_returnsScenarioErrorWithoutCallingDataSource() = runTest {
-        val scenarioStore = MockScenarioStore().apply { setScenario(MockScenario.ERROR) }
-        val dataSource = RecordingTelemetryDataSource(validTelemetryDto())
-        val repository = TelemetryRepositoryImpl(dataSource, scenarioStore)
+    fun getTelemetry_returnsDataSourceErrorMessageWhenDataSourceThrowsIoException() = runTest {
+        val repository = TelemetryRepositoryImpl(
+            dataSource = ThrowingTelemetryDataSource(java.io.IOException("Unable to retrieve bike telemetry."))
+        )
 
         val result = repository.getTelemetry()
 
-        assertEquals(TelemetryResult.Error("Telemetry request failed (500)."), result)
-        assertEquals(0, dataSource.callCount)
+        assertEquals(TelemetryResult.Error("Unable to retrieve bike telemetry."), result)
     }
 
     @Test
     fun getTelemetry_returnsGenericErrorWhenDataSourceFails() = runTest {
         val repository = TelemetryRepositoryImpl(
-            dataSource = ThrowingTelemetryDataSource(RuntimeException("boom")),
-            scenarioStore = MockScenarioStore()
+            dataSource = ThrowingTelemetryDataSource(RuntimeException("boom"))
         )
 
         val result = repository.getTelemetry()
@@ -90,16 +83,4 @@ private class ThrowingTelemetryDataSource(
     private val error: Throwable
 ) : TelemetryDataSource {
     override suspend fun getTelemetry(): TelemetryDto = throw error
-}
-
-private class RecordingTelemetryDataSource(
-    private val dto: TelemetryDto
-) : TelemetryDataSource {
-    var callCount: Int = 0
-        private set
-
-    override suspend fun getTelemetry(): TelemetryDto {
-        callCount += 1
-        return dto
-    }
 }

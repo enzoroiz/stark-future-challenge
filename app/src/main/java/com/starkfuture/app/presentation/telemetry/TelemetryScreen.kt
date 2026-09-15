@@ -96,7 +96,7 @@ fun TelemetryScreen() {
                         TelemetryUiState.Loading -> item { Spacer(Modifier.height(1.dp)) }
                         is TelemetryUiState.Success -> item { SuccessState(state.telemetry) }
                         TelemetryUiState.Empty -> item { EmptyState() }
-                        is TelemetryUiState.Error -> item { ErrorState(viewModel::retry) }
+                        is TelemetryUiState.Error -> item { ErrorState(state.message, viewModel::retry) }
                     }
                 }
             }
@@ -260,7 +260,7 @@ private fun EmptyState() {
 }
 
 @Composable
-private fun ErrorState(retry: () -> Unit) {
+private fun ErrorState(message: String, retry: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth(),
@@ -271,7 +271,7 @@ private fun ErrorState(retry: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Something went wrong while fetching the telemetry",
+                text = message,
                 style = MaterialTheme.typography.bodyLarge,
                 color = DarkTextPrimary
             )

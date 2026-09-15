@@ -2,12 +2,14 @@ package com.starkfuture.app.data.remote
 
 import com.starkfuture.app.data.mock.MockScenario
 import com.starkfuture.app.data.mock.MockScenarioStore
+import com.starkfuture.app.data.remote.model.ErrorBodyDto
 import com.starkfuture.app.data.remote.model.MockTelemetryPayloads
 import com.starkfuture.app.data.remote.model.TelemetryDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import java.io.IOException
 import javax.inject.Inject
 
 class MockTelemetryDataSource @Inject constructor(
@@ -20,6 +22,10 @@ class MockTelemetryDataSource @Inject constructor(
             MockScenario.SUCCESS -> MockTelemetryPayloads.SUCCESS_JSON
             MockScenario.EMPTY -> MockTelemetryPayloads.EMPTY_JSON
             MockScenario.ERROR -> MockTelemetryPayloads.ERROR_JSON
+        }
+        if (scenarioStore.currentScenarioForRequest() == MockScenario.ERROR) {
+            val errorBody = json.decodeFromString(ErrorBodyDto.serializer(), body)
+            throw IOException(errorBody.error?.message ?: "Unable to load telemetry.")
         }
         json.decodeFromString(TelemetryDto.serializer(), body)
     }
