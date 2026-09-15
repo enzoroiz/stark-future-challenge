@@ -16,7 +16,7 @@ import org.junit.Test
 
 class TelemetryRepositoryImplTest {
     @Test
-    fun getTelemetry_returnsSuccessWhenDataSourceReturnsValidTelemetry() = runTest {
+    fun `should return success when data source returns valid telemetry`() = runTest {
         val repository = TelemetryRepositoryImpl(
             dataSource = FakeTelemetryDataSource(validTelemetryDto())
         )
@@ -30,7 +30,7 @@ class TelemetryRepositoryImplTest {
     }
 
     @Test
-    fun getTelemetry_returnsEmptyWhenDataSourceReturnsEmptyTelemetry() = runTest {
+    fun `should return empty when data source returns empty telemetry`() = runTest {
         val repository = TelemetryRepositoryImpl(
             dataSource = FakeTelemetryDataSource(TelemetryDto())
         )
@@ -41,7 +41,7 @@ class TelemetryRepositoryImplTest {
     }
 
     @Test
-    fun getTelemetry_returnsDataSourceErrorMessageWhenDataSourceThrowsIoException() = runTest {
+    fun `should return data source error message when data source throws io exception`() = runTest {
         val repository = TelemetryRepositoryImpl(
             dataSource = ThrowingTelemetryDataSource(java.io.IOException("Unable to retrieve bike telemetry."))
         )
@@ -52,7 +52,7 @@ class TelemetryRepositoryImplTest {
     }
 
     @Test
-    fun getTelemetry_returnsGenericErrorWhenDataSourceFails() = runTest {
+    fun `should return generic error when data source throws unexpected exception`() = runTest {
         val repository = TelemetryRepositoryImpl(
             dataSource = ThrowingTelemetryDataSource(RuntimeException("boom"))
         )

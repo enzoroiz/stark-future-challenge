@@ -39,7 +39,7 @@ class TelemetryViewModelTest {
     }
 
     @Test
-    fun init_loadsSuccessState() = runTest {
+    fun `should load success state on init when repository returns success`() = runTest {
         val viewModel = TelemetryViewModel(
             repository = FakeTelemetryRepository(TelemetryResult.Success(sampleTelemetry())),
             scenarioStore = MockScenarioStore()
@@ -51,7 +51,7 @@ class TelemetryViewModelTest {
     }
 
     @Test
-    fun onScenarioSelected_updatesScenarioAndReloadsTelemetry() = runTest {
+    fun `should update scenario and reload telemetry when scenario is selected`() = runTest {
         val scenarioStore = MockScenarioStore()
         val repository = FakeTelemetryRepository(TelemetryResult.Empty)
         val viewModel = TelemetryViewModel(repository, scenarioStore)
@@ -67,7 +67,7 @@ class TelemetryViewModelTest {
     }
 
     @Test
-    fun retry_reloadsAndPublishesErrorState() = runTest {
+    fun `should reload and publish error state when retry is triggered and repository returns error`() = runTest {
         val repository = FakeTelemetryRepository(TelemetryResult.Error("failed"))
         val viewModel = TelemetryViewModel(repository, MockScenarioStore())
 
@@ -80,7 +80,7 @@ class TelemetryViewModelTest {
     }
 
     @Test
-    fun retry_fromErrorScenario_switchesToSuccessScenarioBeforeReloading() = runTest {
+    fun `should switch to success scenario when retry is triggered from error scenario`() = runTest {
         val scenarioStore = MockScenarioStore().apply { setScenario(MockScenario.ERROR) }
         val repository = ScenarioAwareTelemetryRepository(scenarioStore)
         val viewModel = TelemetryViewModel(repository, scenarioStore)

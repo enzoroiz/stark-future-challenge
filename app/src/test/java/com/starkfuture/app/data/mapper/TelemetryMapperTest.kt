@@ -14,7 +14,7 @@ import org.junit.Test
 
 class TelemetryMapperTest {
     @Test
-    fun toDomain_mapsTelemetryDtoToDomainModel() {
+    fun `should map TelemetryDto to domain model when all required fields are present`() {
         val dto = TelemetryDto(
             bike = BikeDto("Stark VARG MX 1.2", "Alpha", "3.4.1", "https://example.com/bike.webp"),
             timestamp = "2025-05-19T10:32:45Z",
@@ -47,7 +47,7 @@ class TelemetryMapperTest {
     }
 
     @Test
-    fun toDomain_throwsWhenRequiredSectionsAreMissing() {
+    fun `should throw IllegalArgumentException when required sections are missing`() {
         val dto = TelemetryDto()
 
         assertThrows(IllegalArgumentException::class.java) {
