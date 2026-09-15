@@ -4,10 +4,7 @@ import com.starkfuture.app.data.mock.MockScenario
 import com.starkfuture.app.data.mock.MockScenarioStore
 import com.starkfuture.app.data.remote.api.TelemetryApi
 import com.starkfuture.app.data.remote.model.TelemetryDto
-import com.starkfuture.app.data.repository.TelemetryRepositoryImpl
-import com.starkfuture.app.domain.repository.TelemetryRepository
 import com.starkfuture.app.presentation.telemetry.TelemetryFixtures
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,18 +21,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object TelemetryProvidesModule {
-    @Provides
-    @Singleton
-    fun provideJson(): Json = Json {
-        ignoreUnknownKeys = true
-        explicitNulls = false
-    }
-
-    @Provides
-    @Singleton
-    fun provideMockScenarioStore(): MockScenarioStore = MockScenarioStore()
-
+object ApiModule {
     @Provides
     @Singleton
     fun provideTelemetryApi(
@@ -61,14 +47,4 @@ object TelemetryProvidesModule {
             json.decodeFromString(TelemetryDto.serializer(), body)
         }
     }
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class TelemetryBindsModule {
-    @Binds
-    @Singleton
-    abstract fun bindTelemetryRepository(
-        repository: TelemetryRepositoryImpl
-    ): TelemetryRepository
 }
