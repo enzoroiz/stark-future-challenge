@@ -79,6 +79,21 @@ class TelemetryViewModelTest {
         assertEquals(TelemetryUiState.Error("failed"), viewModel.uiState.value)
     }
 
+    @Test
+    fun retry_fromErrorScenario_switchesToSuccessScenarioBeforeReloading() = runTest {
+        val scenarioStore = MockScenarioStore().apply { setScenario(MockScenario.ERROR) }
+        val repository = ScenarioAwareTelemetryRepository(scenarioStore)
+        val viewModel = TelemetryViewModel(repository, scenarioStore)
+
+        advanceUntilIdle()
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertEquals(MockScenario.SUCCESS, viewModel.selectedScenario.value)
+        assertEquals(MockScenario.SUCCESS, scenarioStore.currentScenario.value)
+        assertTrue(viewModel.uiState.value is TelemetryUiState.Success)
+    }
+
     private fun sampleTelemetry() = Telemetry(
         bike = Bike("Stark VARG MX 1.2", "Alpha", "3.4.1", "https://example.com/bike.webp"),
         timestamp = "2025-05-19T10:32:45Z",
@@ -100,4 +115,25 @@ private class FakeTelemetryRepository(
         callCount += 1
         return result
     }
+}
+
+private class ScenarioAwareTelemetryRepository(
+    private val scenarioStore: MockScenarioStore
+) : TelemetryRepository {
+    override suspend fun getTelemetry(): TelemetryResult =
+        if (scenarioStore.currentScenario.value == MockScenario.ERROR) {
+            TelemetryResult.Error("failed")
+        } else {
+            TelemetryResult.Success(
+                Telemetry(
+                    bike = Bike("Stark VARG MX 1.2", "Alpha", "3.4.1", "https://example.com/bike.webp"),
+                    timestamp = "2025-05-19T10:32:45Z",
+                    battery = Battery(73, 38, 34.7, "discharging"),
+                    motor = Motor(52.4, 61.2),
+                    rideSettings = RideSettings("enduro", 80, 45, 60),
+                    session = Session(3742, "1:02:22", 24.7, 94.1),
+                    warnings = listOf(Warning("W_MOT_TEMP_HIGH", "Motor temperature elevated", "warning"))
+                )
+            )
+        }
 }

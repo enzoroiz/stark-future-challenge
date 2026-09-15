@@ -35,7 +35,13 @@ class TelemetryViewModel @Inject constructor(
         loadTelemetry()
     }
 
-    fun retry() = loadTelemetry()
+    fun retry() {
+        if (_selectedScenario.value == MockScenario.ERROR) {
+            _selectedScenario.value = MockScenario.SUCCESS
+            scenarioStore.setScenario(MockScenario.SUCCESS)
+        }
+        loadTelemetry()
+    }
 
     fun loadTelemetry() {
         viewModelScope.launch {
