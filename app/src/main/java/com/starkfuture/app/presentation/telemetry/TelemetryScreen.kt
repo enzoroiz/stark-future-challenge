@@ -80,10 +80,10 @@ fun TelemetryScreen() {
                     }
 
                     when (val state = uiState) {
-                        TelemetryUiState.Loading -> item { Spacer(Modifier.height(1.dp)) }
                         is TelemetryUiState.Success -> item { SuccessState(state.telemetry) }
                         TelemetryUiState.Empty -> item { EmptyState() }
                         is TelemetryUiState.Error -> item { ErrorState(state.message, viewModel::retry) }
+                        else -> { /* No content for loading state, handled below */ }
                     }
                 }
             }
