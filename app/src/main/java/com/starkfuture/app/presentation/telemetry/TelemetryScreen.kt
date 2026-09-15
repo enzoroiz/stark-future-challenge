@@ -246,24 +246,26 @@ private fun IconValueRow(
 @Composable
 private fun EmptyState() {
     Box(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.CenterStart
     ) {
-        Text(
-            text = "There's no telemetry available",
-            style = MaterialTheme.typography.bodyLarge,
-            color = DarkTextPrimary,
-            modifier = Modifier.fillMaxWidth()
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "There's no telemetry available",
+                style = MaterialTheme.typography.bodyLarge,
+                color = DarkTextPrimary
+            )
+        }
     }
 }
 
 @Composable
 private fun ErrorState(message: String, retry: () -> Unit) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.CenterStart
     ) {
         Column(
